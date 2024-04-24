@@ -1,40 +1,78 @@
 <?= $this->extend('layouts/dashboard') ?>
 <?= $this->section('contenido') ?>
-
 <h1>Products</h1>
-<a class="btn btn-primary" href="new">Crear</a>
-<div id="blockSelectUser" style="display:none">
-    <select class="user">
-        <?php foreach ($users as $key): ?>
-            <option value="<?= $key->userid ?>"><?= $key->username ?></option>
-        <?php endforeach ?>
-    </select>
-    <label for="" class="errorDirection"></label>
-    <textarea class="direction" cols="15" rows="5" placeholder="Direction"></textarea>
-    <label for="" class="errorDescription"></label>
-    <textarea class="description" cols="15" rows="5" placeholder="Description"></textarea>
-    <button data-input="" class="user">Enviar</button>
+<a class="btn btn-primary mt-3" href="new">Crear</a>
+
+<div class="modal fade" id="blockSelectUser" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestión ventas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <select class="form-control user mb-3">
+                    <?php foreach ($users as $key): ?>
+                        <option value="<?= $key->userid ?>"><?= $key->username ?></option>
+                    <?php endforeach ?>
+                </select>
+                <div for="" class="errorDirection alert alert-danger mb3" style="display:none"></div>
+                <textarea class="direction form-control mb-3" cols="15" rows="5" placeholder="Direction"></textarea>
+                <label for="" class="errorDescription alert alert-danger mb-3" style="display:none"></label>
+                <textarea class="description form-control" cols="15" rows="5" placeholder="Description"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button data-input="" class="user btn btn-success">Enviar</button>
+            </div>
+        </div>
+    </div>
 </div>
-<form method="get">
-    <label for="">Categoria</label>
-    <select name="categoryid" id="categoryid">
-        <option value="">Default</option>
-        <?php foreach ($categories as $key): ?>
-            <option <?= $category == $key->categoryid ? 'selected' : '' ?> value=" <?= $key->categoryid ?>"> <?= $key->name ?>
-            </option>
-        <?php endforeach ?>
-    </select>
-    <label for="">Etiqueta</label>
-    <select multiple name="tagid[]" id="tagid">
-        <option value="">Default</option>
-        <?php foreach ($tags as $key): ?>
-            <option <?= in_array($key->tagid, $tag)? 'selected' : '' ?> value="<?= $key->tagid ?>"> <?= $key->name ?>
-            </option>
-        <?php endforeach ?>
-    </select>
-    <button type="submit">Enviar</button>
-</form>
-<table>
+
+
+
+
+
+<div class="card mt-3 mb-3">
+    <div class="card-header">
+        <button data-bs-toggle="collapse" data-bs-target="#filters" class="btn btn-flat float-end">Show</button>
+        <h4>Filtros</h4>
+    </div>
+    <div class="card-body collapse" id="filters">
+
+        <form method="get">
+            <div class="row">
+                <div class="col-6">
+                    <label for="">Categoria</label>
+                    <select class="form-select mb-3" name="categoryid" id="categoryid">
+                        <option value="">Default</option>
+                        <?php foreach ($categories as $key): ?>
+                            <option <?= $category == $key->categoryid ? 'selected' : '' ?> value=" <?= $key->categoryid ?>">
+                                <?= $key->name ?>
+                            </option>
+                        <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label for="">Etiqueta</label>
+                    <select class="form-select mb-3 overflow-auto" multiple name="tagid[]" id="tagid">
+                        <option value="">Default</option>
+                        <?php foreach ($tags as $key): ?>
+                            <option <?= in_array($key->tagid, $tag) ? 'selected' : '' ?> value="<?= $key->tagid ?>">
+                                <?= $key->name ?>
+                            </option>
+                        <?php endforeach ?>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-success btn-sm" type="submit">Enviar</button>
+        </form>
+
+    </div>
+</div>
+
+<table class="table">
     <tr>
         <th>ID</th>
         <th>Name</th>
@@ -57,11 +95,12 @@
             <th id="stock_<?= $key->productid ?>"> <?= $key->stock ?></th>
             <th> <?= $key->price ?></th>
             <th>
-                <a href="show/<?= $key->productid ?>">SHOW</a>
-                <a href="edit/<?= $key->productid ?>">EDIT</a>
-                <form action="delete/<?= $key->productid ?>" method="POST"><button class="btn btn-danger"
-                        type="submit">DELETE</button></form>
-                <a href="<?= route_to('product.trace', $key->productid) ?>">TRACE</a>
+                <a class="btn btn-primary btn-sm mb-1 d-block d-block" href="show/<?= $key->productid ?>">SHOW</a>
+                <a class="btn btn-primary btn-sm mb-1 d-block" href="edit/<?= $key->productid ?>">EDIT</a>
+                <form action="delete/<?= $key->productid ?>" method="POST"><button
+                        class="btn btn-danger btn-sm mb-1 d-block" type="submit">DELETE</button></form>
+                <a class="btn btn-secondary btn-sm mb-3 d-block"
+                    href="<?= route_to('product.trace', $key->productid) ?>">TRACE</a>
             </th>
         </tr>
 
@@ -79,6 +118,7 @@
     let userEntry = []
     let userExit = []
     let select_user = document.querySelector('select.user')
+    let modal = new bootstrap.Modal(document.getElementById('blockSelectUser'));
 
     function getUsers() {
         fetch('/dashboard/getUsers/' + typeUser)
@@ -125,6 +165,7 @@
                 } else {
                     populateSelectUser()
                 }
+                modal.toggle()
             }
 
         })
@@ -146,6 +187,7 @@
                 } else {
                     populateSelectUser()
                 }
+                modal.toggle()
             }
 
         })
@@ -173,14 +215,28 @@
                     return res.json()
                 })
                 .then(res => {
+                    modal.toggle()
+                    errorDirection.style.display = "none"
+                    errorDescription.style.display = "none"
                     blockSelectUser.style.display = "none"
                     resetForm()
                     document.querySelector(`#stock_${res['productid']}`).innerHTML = res['stock']
                     // console.log(res['stock'])
                 }).catch((err) => {
                     // console.error(err.messages.description)
-                    errorDirection.innerHTML = err.messages.direction
-                    errorDescription.innerHTML = err.messages.description
+                    if (err.messages.direction == "") {
+                        errorDirection.style.display = "none"
+
+                    } else {
+                        errorDirection.style.display = "block"
+                        errorDirection.innerHTML = err.messages.direction
+                    }
+                    if (err.messages.description == "") {
+                        errorDescription.style.display = "none"
+                    } else {
+                        errorDescription.style.display = "block"
+                        errorDescription.innerHTML = err.messages.description
+                    }
                     // console.error(err.messages.direction)
                 })
         }
@@ -204,18 +260,36 @@
                     return res.json()
                 })
                 .then(res => {
+                    modal.toggle()
+
                     blockSelectUser.style.display = "none"
+                    errorDirection.style.display = "none"
+                    errorDescription.style.display = "none"
                     resetForm()
                     document.querySelector(`#stock_${res['productid']}`).innerHTML = res['stock']
                     // console.log(res['stock'])
                 }).catch((err) => {
+
+                    if (err.messages.direction == "") {
+                        errorDirection.style.display = "none"
+
+                    } else {
+                        errorDirection.style.display = "block"
+                        errorDirection.innerHTML = err.messages.direction
+                    }
+                    if (err.messages.description == "") {
+                        errorDescription.style.display = "none"
+                    } else {
+                        errorDescription.style.display = "block"
+                        errorDescription.innerHTML = err.messages.description
+                    }
+                    // console.error(err.messages.direction)
                     // console.error(err.messages.description)
-                    errorDirection.innerHTML = err.messages.direction
-                    errorDescription.innerHTML = err.messages.description
+
+
                     // console.error(err.messages.direction)
                 })
         }
-
     })
 
     function resetForm() {
